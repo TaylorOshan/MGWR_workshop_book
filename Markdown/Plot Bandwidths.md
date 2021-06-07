@@ -1,5 +1,3 @@
-
-
 ```python
 %matplotlib inline
 %config InlineBackend.figure_format='retina'
@@ -78,7 +76,9 @@ global_bws, global_soc = plotBws('../bws_global_start.csv', 'Starting value: all
 ```
 
 
+    
 ![png](Plot%20Bandwidths_files/Plot%20Bandwidths_2_0.png)
+    
 
 
 
@@ -87,7 +87,9 @@ local_bws, local_soc = plotBws('../bws_local_start.csv', 'Starting value: all ba
 ```
 
 
+    
 ![png](Plot%20Bandwidths_files/Plot%20Bandwidths_3_0.png)
+    
 
 
 
@@ -96,7 +98,9 @@ gwr_bws, gwr_soc = plotBws('../bws_gwr_start.csv', 'Starting value: GWR bandwidt
 ```
 
 
+    
 ![png](Plot%20Bandwidths_files/Plot%20Bandwidths_4_0.png)
+    
 
 
 
@@ -131,7 +135,9 @@ plt.yticks([])
 
 
 
+    
 ![png](Plot%20Bandwidths_files/Plot%20Bandwidths_5_1.png)
+    
 
 
 
@@ -186,7 +192,9 @@ plt.ylabel('Bandwidth')
 
 
 
+    
 ![png](Plot%20Bandwidths_files/Plot%20Bandwidths_8_1.png)
+    
 
 
 

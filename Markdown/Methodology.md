@@ -1,4 +1,3 @@
-
 # <center> Methodological Review of GWR and MGWR </center>
 
 **Notebook Outline:**  

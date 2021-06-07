@@ -1,4 +1,3 @@
-
 # <center> Hands-on Example with MGWR </center>
 
 **Notebook Outline:**  

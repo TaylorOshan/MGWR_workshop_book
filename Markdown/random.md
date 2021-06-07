@@ -1,5 +1,3 @@
-
-
 ```python
 import pandas as pd
 import numpy as np
@@ -20,7 +18,7 @@ plt.hist(df['avg_price'],color="orange")
       keep = (tmp_a >= first_edge)
     C:\Users\msachde1\AppData\Roaming\Python\Python36\site-packages\numpy\lib\histograms.py:830: RuntimeWarning: invalid value encountered in less_equal
       keep &= (tmp_a <= last_edge)
-    
+
 
 
 
@@ -34,7 +32,9 @@ plt.hist(df['avg_price'],color="orange")
 
 
 
+    
 ![png](random_files/random_2_2.png)
+    
 
 
 

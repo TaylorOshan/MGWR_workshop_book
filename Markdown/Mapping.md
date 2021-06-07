@@ -1,4 +1,3 @@
-
 # <center> Mapping Parameter Coefficients </center>
 
 **Notebook Outline:**  
@@ -71,7 +70,9 @@ maps.mapp(name='beta_avg_age',color='RdBu_r',filename="b_age",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_10_0.png)
+    
 
 
 ### Only significant parameter estimates for age covariate
@@ -82,7 +83,9 @@ maps.mapp(name='bt_age',color='Reds',filename="bt_age",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_12_0.png)
+    
 
 
 
@@ -91,7 +94,9 @@ maps.mapp(name='bt_water_dist',color='Blues_r',filename="bt_water_dist",normal=F
 ```
 
 
+    
 ![png](Mapping_files/Mapping_13_0.png)
+    
 
 
 
@@ -100,7 +105,9 @@ maps.mapp(name='bt_sqft',color='Reds',filename="bt_sqft",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_14_0.png)
+    
 
 
 
@@ -109,7 +116,9 @@ maps.mapp(name='bt_unemp',color='Blues_r',filename="bt_unemp",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_15_0.png)
+    
 
 
 
@@ -118,7 +127,9 @@ maps.mapp(name='bt_tech',color='Reds',filename="bt_tech",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_16_0.png)
+    
 
 
 
@@ -127,7 +138,9 @@ maps.mapp(name='bt_constant',color='RdBu_r',filename="bt_constant",normal=False)
 ```
 
 
+    
 ![png](Mapping_files/Mapping_17_0.png)
+    
 
 
 # Interpretation of Maps
@@ -140,7 +153,9 @@ maps.mapp(name='bt_water_dist',color='Blues_r',filename="bt_water_dist",normal=F
 ```
 
 
+    
 ![png](Mapping_files/Mapping_20_0.png)
+    
 
 
 #### Scale of spatial units used is essential in interpreting the results of the parameter coefficients

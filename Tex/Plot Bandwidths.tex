@@ -1,44 +1,30 @@
-
-% Default to the notebook output style
-
-    
-
-
-% Inherit from the specified cell style.
-
-
-
-
-    
 \documentclass[11pt]{article}
 
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
     
-    
-    \usepackage[T1]{fontenc}
-    % Nicer default font (+ math font) than Computer Modern for most use cases
-    \usepackage{mathpazo}
+    \usepackage{iftex}
+    \ifPDFTeX
+    	\usepackage[T1]{fontenc}
+    	\usepackage{mathpazo}
+    \else
+    	\usepackage{fontspec}
+    \fi
 
     % Basic figure setup, for now with no caption control since it's done
     % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
     \usepackage{graphicx}
-    % We will generate all images so they have a width \maxwidth. This means
-    % that they will get their normal width if they fit onto the page, but
-    % are scaled down if they would overflow the margins.
-    \makeatletter
-    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
-    \else\Gin@nat@width\fi}
-    \makeatother
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
     \let\Oldincludegraphics\includegraphics
-    % Set max figure width to be 80% of text width, for now hardcoded.
-    \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=.8\maxwidth]{#1}}
     % Ensure that by default, figures have no caption (until we provide a
     % proper Figure object with a Caption API and a way to capture that
     % in the conversion process - todo).
     \usepackage{caption}
-    \DeclareCaptionLabelFormat{nolabel}{}
-    \captionsetup{labelformat=nolabel}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
 
-    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
     \usepackage{xcolor} % Allow colors to be defined
     \usepackage{enumerate} % Needed for markdown enumerations to work
     \usepackage{geometry} % Used to adjust the document margins
@@ -52,14 +38,32 @@
     \usepackage{upquote} % Upright quotes for verbatim code
     \usepackage{eurosym} % defines \euro
     \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
-    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
     \usepackage{fancyvrb} % verbatim replacement that allows latex
     \usepackage{grffile} % extends the file name processing of package graphics 
-                         % to support a larger range 
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
     % The hyperref package gives us a pdf with properly built
     % internal navigation ('pdf bookmarks' for the table of contents,
     % internal cross-reference links, web links for URLs, etc.)
     \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
     \usepackage{longtable} % longtable support required by pandoc >1.10
     \usepackage{booktabs}  % table support for pandoc > 1.12.2
     \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
@@ -68,7 +72,6 @@
     \usepackage{mathrsfs}
     
 
-    
     
     % Colors for the hyperref package
     \definecolor{urlcolor}{rgb}{0,.145,.698}
@@ -94,6 +97,9 @@
     \definecolor{ansi-white-intense}{HTML}{A1A6B2}
     \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
     \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
 
     % commands and environments needed by pandoc snippets
     % extracted from the output of `pandoc -s`
@@ -155,9 +161,7 @@
     
     
     
-
-    % Pygments definitions
-    
+% Pygments definitions
 \makeatletter
 \def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
     \let\PY@ul=\relax \let\PY@tc=\relax%
@@ -259,11 +263,97 @@
 \makeatother
 
 
+    % For linebreaks inside Verbatim environment from package fancyvrb. 
+    \makeatletter
+        \newbox\Wrappedcontinuationbox 
+        \newbox\Wrappedvisiblespacebox 
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}} 
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}} 
+        \newcommand*\Wrappedcontinuationindent {3ex } 
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox} 
+        % Take advantage of the already applied Pygments mark-up to insert 
+        % potential linebreaks for TeX processing. 
+        %        {, <, #, %, $, ' and ": go to next line. 
+        %        _, }, ^, &, >, - and ~: stay at end of broken line. 
+        % Use of \textquotesingle for straight quote. 
+        \newcommand*\Wrappedbreaksatspecials {% 
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}% 
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}% 
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}% 
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}% 
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}% 
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}% 
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}% 
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}% 
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}% 
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}% 
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}% 
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}% 
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}% 
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}% 
+        } 
+        % Some characters . , ; ? ! / are not pygmentized. 
+        % This macro makes them "active" and they will insert potential linebreaks 
+        \newcommand*\Wrappedbreaksatpunct {% 
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}% 
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}% 
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}% 
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}% 
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}% 
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}% 
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}% 
+            \catcode`\.\active
+            \catcode`\,\active 
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active 
+            \lccode`\~`\~ 	
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+        
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active 	
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
     % Exact colors from NB
-    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
-    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
-
-
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+    
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
 
     
     % Prevent overflowing lines due to hard-to-break entities
@@ -282,207 +372,251 @@
     
     
 
-    \begin{document}
-    
+\begin{document}
     
     \maketitle
     
     
 
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}42}]:} \PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline
-         \PY{o}{\PYZpc{}}\PY{k}{config} InlineBackend.figure\PYZus{}format=\PYZsq{}retina\PYZsq{}
-         \PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
-         \PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
-         \PY{k+kn}{import} \PY{n+nn}{mgwr}
-         \PY{k+kn}{import} \PY{n+nn}{pickle}
-         \PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
-         \PY{k+kn}{from} \PY{n+nn}{io} \PY{k}{import} \PY{n}{StringIO}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{42}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline
+\PY{o}{\PYZpc{}}\PY{k}{config} InlineBackend.figure\PYZus{}format=\PYZsq{}retina\PYZsq{}
+\PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{import} \PY{n+nn}{mgwr}
+\PY{k+kn}{import} \PY{n+nn}{pickle}
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+\PY{k+kn}{from} \PY{n+nn}{io} \PY{k+kn}{import} \PY{n}{StringIO}
 \end{Verbatim}
+\end{tcolorbox}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}83}]:} \PY{n}{filename} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}global\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}
-         
-         \PY{k}{def} \PY{n+nf}{plotBws}\PY{p}{(}\PY{n}{filename}\PY{p}{,} \PY{n}{title}\PY{p}{)}\PY{p}{:}
-             \PY{k}{with} \PY{n+nb}{open}\PY{p}{(}\PY{n}{filename}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{as} \PY{n}{inf}\PY{p}{:}
-                 \PY{n}{lines} \PY{o}{=} \PY{n}{inf}\PY{o}{.}\PY{n}{readlines}\PY{p}{(}\PY{p}{)}
-                 \PY{n}{soclines} \PY{o}{=} \PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Current iteration: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{lines}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{]}
-                 \PY{n}{bwlines} \PY{o}{=} \PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidths: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{lines}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{]}
-         
-                 \PY{n}{soc} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{n}{StringIO}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{soclines}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{header}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}
-                 \PY{n}{bw} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{n}{StringIO}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{bwlines}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{header}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}
-         
-                 \PY{n}{soc}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
-                 \PY{n}{bw}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}
-                     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{avg\PYZus{}commute\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{c+c1}{\PYZsh{} Alternate specification of commute distance}
-              \PY{c+c1}{\PYZsh{}\PYZsq{}pct\PYZus{}commute\PYZus{}less2km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}2\PYZus{}10km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}10\PYZus{}20km\PYZsq{},}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctbachdeg}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-               \PY{c+c1}{\PYZsh{} the original paper had the low\PYZhy{}income cutoff at 20k but that\PYZsq{}s just really low}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income0\PYZus{}35k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income35\PYZus{}50k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-               \PY{c+c1}{\PYZsh{}\PYZsq{}income50\PYZus{}100k\PYZsq{}, \PYZsh{} removed due to multicollinearity}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pcthhkids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}cbd}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} NB high correlation with bachelor\PYZsq{}s degree}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctmultifamily}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctrent}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{luentropy}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{access60}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} lower cutoff metric might be preferable, access30 and access45 are also available}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnldist\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnpopdens\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnjob\PYZus{}dens\PYZus{}500m\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-              \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}chicago}\PY{l+s+s1}{\PYZsq{}}
-             \PY{p}{]}
-                 \PY{n}{f}\PY{p}{,} \PY{n}{ax1} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
-         
-                 \PY{k}{for} \PY{n}{idx}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{bw}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
-                     \PY{n}{ax1}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{bw}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{bw}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{n}{col}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZhy{}\PYZhy{}}\PY{l+s+s1}{\PYZsq{}} \PY{k}{if} \PY{n}{idx} \PY{o}{\PYZgt{}} \PY{l+m+mi}{9} \PY{k}{else} \PY{k+kc}{None}\PY{p}{)}\PY{p}{,} \PY{n}{lw}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{3} \PY{k}{if} \PY{n}{col} \PY{o}{==} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}} \PY{k}{else} \PY{l+m+mf}{0.75}\PY{p}{)}\PY{p}{)}
-         
-                 \PY{n}{ax2} \PY{o}{=} \PY{n}{ax1}\PY{o}{.}\PY{n}{twinx}\PY{p}{(}\PY{p}{)}
-                 \PY{n}{ax2}\PY{o}{.}\PY{n}{semilogy}\PY{p}{(}\PY{p}{)}
-                 \PY{n}{ax2}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{soc}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{soc}\PY{o}{.}\PY{n}{SOC}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{:}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{black}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         
-                 \PY{n}{ax1}\PY{o}{.}\PY{n}{set\PYZus{}xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-                 \PY{n}{ax1}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-                 \PY{n}{ax2}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         
-                 \PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{n}{title}\PY{p}{)}
-                 
-                 \PY{n}{ax1}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
-                 \PY{n}{ax2}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
-                 
-                 \PY{k}{return} \PY{n}{bw}\PY{p}{,} \PY{n}{soc}
-         
-             
-             
-             
-\end{Verbatim}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{83}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{filename} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}global\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}84}]:} \PY{n}{global\PYZus{}bws}\PY{p}{,} \PY{n}{global\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}global\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: all bandwidths global (1996)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{k}{def} \PY{n+nf}{plotBws}\PY{p}{(}\PY{n}{filename}\PY{p}{,} \PY{n}{title}\PY{p}{)}\PY{p}{:}
+    \PY{k}{with} \PY{n+nb}{open}\PY{p}{(}\PY{n}{filename}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{as} \PY{n}{inf}\PY{p}{:}
+        \PY{n}{lines} \PY{o}{=} \PY{n}{inf}\PY{o}{.}\PY{n}{readlines}\PY{p}{(}\PY{p}{)}
+        \PY{n}{soclines} \PY{o}{=} \PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Current iteration: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{lines}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{]}
+        \PY{n}{bwlines} \PY{o}{=} \PY{p}{[}\PY{n}{i}\PY{o}{.}\PY{n}{replace}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidths: }\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n}{lines}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]}\PY{p}{]}
+
+        \PY{n}{soc} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{n}{StringIO}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{soclines}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{header}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}
+        \PY{n}{bw} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{n}{StringIO}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+se}{\PYZbs{}n}\PY{l+s+s1}{\PYZsq{}}\PY{o}{.}\PY{n}{join}\PY{p}{(}\PY{n}{bwlines}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{header}\PY{o}{=}\PY{k+kc}{None}\PY{p}{)}
+
+        \PY{n}{soc}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+        \PY{n}{bw}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}
+            \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{avg\PYZus{}commute\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{c+c1}{\PYZsh{} Alternate specification of commute distance}
+     \PY{c+c1}{\PYZsh{}\PYZsq{}pct\PYZus{}commute\PYZus{}less2km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}2\PYZus{}10km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}10\PYZus{}20km\PYZsq{},}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctbachdeg}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+      \PY{c+c1}{\PYZsh{} the original paper had the low\PYZhy{}income cutoff at 20k but that\PYZsq{}s just really low}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income0\PYZus{}35k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income35\PYZus{}50k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+      \PY{c+c1}{\PYZsh{}\PYZsq{}income50\PYZus{}100k\PYZsq{}, \PYZsh{} removed due to multicollinearity}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pcthhkids}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}cbd}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} NB high correlation with bachelor\PYZsq{}s degree}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctmultifamily}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctrent}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{luentropy}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{access60}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} lower cutoff metric might be preferable, access30 and access45 are also available}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnldist\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnpopdens\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnjob\PYZus{}dens\PYZus{}500m\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+     \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}chicago}\PY{l+s+s1}{\PYZsq{}}
+    \PY{p}{]}
+        \PY{n}{f}\PY{p}{,} \PY{n}{ax1} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
+
+        \PY{k}{for} \PY{n}{idx}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{bw}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
+            \PY{n}{ax1}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{bw}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{bw}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{n}{col}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZhy{}\PYZhy{}}\PY{l+s+s1}{\PYZsq{}} \PY{k}{if} \PY{n}{idx} \PY{o}{\PYZgt{}} \PY{l+m+mi}{9} \PY{k}{else} \PY{k+kc}{None}\PY{p}{)}\PY{p}{,} \PY{n}{lw}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{3} \PY{k}{if} \PY{n}{col} \PY{o}{==} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}} \PY{k}{else} \PY{l+m+mf}{0.75}\PY{p}{)}\PY{p}{)}
+
+        \PY{n}{ax2} \PY{o}{=} \PY{n}{ax1}\PY{o}{.}\PY{n}{twinx}\PY{p}{(}\PY{p}{)}
+        \PY{n}{ax2}\PY{o}{.}\PY{n}{semilogy}\PY{p}{(}\PY{p}{)}
+        \PY{n}{ax2}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{soc}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{soc}\PY{o}{.}\PY{n}{SOC}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{:}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{black}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+        \PY{n}{ax1}\PY{o}{.}\PY{n}{set\PYZus{}xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+        \PY{n}{ax1}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+        \PY{n}{ax2}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{SOC}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+        \PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{n}{title}\PY{p}{)}
+        
+        \PY{n}{ax1}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
+        \PY{n}{ax2}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
+        
+        \PY{k}{return} \PY{n}{bw}\PY{p}{,} \PY{n}{soc}
+
+    
+    
+    
 \end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{84}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{global\PYZus{}bws}\PY{p}{,} \PY{n}{global\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}global\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: all bandwidths global (1996)}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Plot Bandwidths_files/Plot Bandwidths_2_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}85}]:} \PY{n}{local\PYZus{}bws}\PY{p}{,} \PY{n}{local\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}local\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: all bandwidths 30}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{85}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{local\PYZus{}bws}\PY{p}{,} \PY{n}{local\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}local\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: all bandwidths 30}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Plot Bandwidths_files/Plot Bandwidths_3_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}86}]:} \PY{n}{gwr\PYZus{}bws}\PY{p}{,} \PY{n}{gwr\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}gwr\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: GWR bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{86}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{gwr\PYZus{}bws}\PY{p}{,} \PY{n}{gwr\PYZus{}soc} \PY{o}{=} \PY{n}{plotBws}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{../bws\PYZus{}gwr\PYZus{}start.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting value: GWR bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Plot Bandwidths_files/Plot Bandwidths_4_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}90}]:} \PY{c+c1}{\PYZsh{} plot all triads}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
-         \PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
-             \PY{n}{idx} \PY{o}{=} \PY{n}{i} \PY{o}{/}\PY{o}{/} \PY{l+m+mi}{4} \PY{o}{*} \PY{l+m+mi}{5} \PY{o}{+} \PY{n}{i} \PY{o}{\PYZpc{}} \PY{l+m+mi}{4} \PY{o}{+} \PY{l+m+mi}{1}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{,} \PY{n}{idx}\PY{p}{)}
-             
-             \PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{n}{col}\PY{p}{)}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{global\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{local\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{local\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{local\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{gwr\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{yticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
-             
-         \PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{1996}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{30}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{GWR}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{n}{title}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{yticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
-\end{Verbatim}
-
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{90}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}90}]:} ([], <a list of 0 Text yticklabel objects>)
+\PY{c+c1}{\PYZsh{} plot all triads}
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
+\PY{k}{for} \PY{n}{i}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
+    \PY{n}{idx} \PY{o}{=} \PY{n}{i} \PY{o}{/}\PY{o}{/} \PY{l+m+mi}{4} \PY{o}{*} \PY{l+m+mi}{5} \PY{o}{+} \PY{n}{i} \PY{o}{\PYZpc{}} \PY{l+m+mi}{4} \PY{o}{+} \PY{l+m+mi}{1}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{,} \PY{n}{idx}\PY{p}{)}
+    
+    \PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{n}{col}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{global\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{global\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{local\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{local\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{local\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{o}{.}\PY{n}{index} \PY{o}{/} \PY{n+nb}{max}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{o}{.}\PY{n}{index}\PY{p}{)}\PY{p}{,} \PY{n}{gwr\PYZus{}bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{yticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
+    
+\PY{n}{plt}\PY{o}{.}\PY{n}{subplot}\PY{p}{(}\PY{l+m+mi}{4}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{,} \PY{l+m+mi}{5}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{1996}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{30}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{p}{[}\PY{l+m+mi}{1}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{GWR}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{n}{title}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Starting bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{yticks}\PY{p}{(}\PY{p}{[}\PY{p}{]}\PY{p}{)}
 \end{Verbatim}
-            
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{90}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+([], <a list of 0 Text yticklabel objects>)
+\end{Verbatim}
+\end{tcolorbox}
+        
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Plot Bandwidths_files/Plot Bandwidths_5_1.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}82}]:} \PY{n+nb}{len}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{p}{)}
-\end{Verbatim}
-
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{82}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}82}]:} 85
+\PY{n+nb}{len}\PY{p}{(}\PY{n}{gwr\PYZus{}bws}\PY{p}{)}
 \end{Verbatim}
-            
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}18}]:} \PY{n}{bws}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}
-             \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{avg\PYZus{}commute\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{c+c1}{\PYZsh{} Alternate specification of commute distance}
-          \PY{c+c1}{\PYZsh{}\PYZsq{}pct\PYZus{}commute\PYZus{}less2km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}2\PYZus{}10km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}10\PYZus{}20km\PYZsq{},}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctbachdeg}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-           \PY{c+c1}{\PYZsh{} the original paper had the low\PYZhy{}income cutoff at 20k but that\PYZsq{}s just really low}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income35\PYZus{}50k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-           \PY{c+c1}{\PYZsh{}\PYZsq{}income50\PYZus{}100k\PYZsq{}, \PYZsh{} removed due to multicollinearity}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}cbd}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} NB high correlation with bachelor\PYZsq{}s degree}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctrent}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{access60}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} lower cutoff metric might be preferable, access30 and access45 are also available}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnldist\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnpopdens\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnjob\PYZus{}dens\PYZus{}500m\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
-          \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}chicago}\PY{l+s+s1}{\PYZsq{}}
-         \PY{p}{]}
-\end{Verbatim}
+\end{tcolorbox}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}28}]:} \PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
-         \PY{k}{for} \PY{n}{idx}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{bws}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
-             \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{bws}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{n}{col}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZhy{}\PYZhy{}}\PY{l+s+s1}{\PYZsq{}} \PY{k}{if} \PY{n}{idx} \PY{o}{\PYZgt{}} \PY{l+m+mi}{9} \PY{k}{else} \PY{k+kc}{None}\PY{p}{)}\PY{p}{,} \PY{n}{lw}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{3} \PY{k}{if} \PY{n}{col} \PY{o}{==} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}} \PY{k}{else} \PY{l+m+mf}{0.75}\PY{p}{)}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-\end{Verbatim}
-
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{82}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}28}]:} Text(0, 0.5, 'Bandwidth')
+85
 \end{Verbatim}
-            
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{18}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{bws}\PY{o}{.}\PY{n}{columns} \PY{o}{=} \PY{p}{[}
+    \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{const}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{avg\PYZus{}commute\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{c+c1}{\PYZsh{} Alternate specification of commute distance}
+ \PY{c+c1}{\PYZsh{}\PYZsq{}pct\PYZus{}commute\PYZus{}less2km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}2\PYZus{}10km\PYZsq{}, \PYZsq{}pct\PYZus{}commute\PYZus{}10\PYZus{}20km\PYZsq{},}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctbachdeg}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+  \PY{c+c1}{\PYZsh{} the original paper had the low\PYZhy{}income cutoff at 20k but that\PYZsq{}s just really low}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{income35\PYZus{}50k}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+  \PY{c+c1}{\PYZsh{}\PYZsq{}income50\PYZus{}100k\PYZsq{}, \PYZsh{} removed due to multicollinearity}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}cbd}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} NB high correlation with bachelor\PYZsq{}s degree}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctrent}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{access60}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{c+c1}{\PYZsh{} lower cutoff metric might be preferable, access30 and access45 are also available}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnldist\PYZus{}km}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnpopdens\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{lnjob\PYZus{}dens\PYZus{}500m\PYZus{}km2}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}
+ \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pct\PYZus{}w\PYZus{}chicago}\PY{l+s+s1}{\PYZsq{}}
+\PY{p}{]}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{28}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{plt}\PY{o}{.}\PY{n}{figure}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{16}\PY{p}{,} \PY{l+m+mi}{12}\PY{p}{)}\PY{p}{)}
+\PY{k}{for} \PY{n}{idx}\PY{p}{,} \PY{n}{col} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{bws}\PY{o}{.}\PY{n}{columns}\PY{p}{)}\PY{p}{:}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{bws}\PY{o}{.}\PY{n}{index}\PY{p}{,} \PY{n}{bws}\PY{p}{[}\PY{n}{col}\PY{p}{]}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{n}{col}\PY{p}{,} \PY{n}{ls}\PY{o}{=}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZhy{}\PYZhy{}}\PY{l+s+s1}{\PYZsq{}} \PY{k}{if} \PY{n}{idx} \PY{o}{\PYZgt{}} \PY{l+m+mi}{9} \PY{k}{else} \PY{k+kc}{None}\PY{p}{)}\PY{p}{,} \PY{n}{lw}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{3} \PY{k}{if} \PY{n}{col} \PY{o}{==} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{pctnovehicle}\PY{l+s+s1}{\PYZsq{}} \PY{k}{else} \PY{l+m+mf}{0.75}\PY{p}{)}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Iteration}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Bandwidth}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{28}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+Text(0, 0.5, 'Bandwidth')
+\end{Verbatim}
+\end{tcolorbox}
+        
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Plot Bandwidths_files/Plot Bandwidths_8_1.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}35}]:} \PY{n}{models}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mgwr}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mod}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{bws}
-\end{Verbatim}
-
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{35}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}35}]:} array([1996.,  450., 1996., 1996.,  966., 1986.,  192., 1996., 1996.,
-                1819., 1986., 1996.,  821., 1976.,  240.,  664.])
+\PY{n}{models}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mgwr}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{mod}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{bws}
 \end{Verbatim}
-            
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor} }]:} 
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{35}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+array([1996.,  450., 1996., 1996.,  966., 1986.,  192., 1996., 1996.,
+       1819., 1986., 1996.,  821., 1976.,  240.,  664.])
 \end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+
+\end{Verbatim}
+\end{tcolorbox}
 
 
     % Add a bibliography block to the postdoc
     
     
     
-    \end{document}
+\end{document}

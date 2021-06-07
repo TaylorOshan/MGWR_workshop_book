@@ -1,5 +1,3 @@
-
-
 ```python
 #@title Python imports
 # A bit of imports
@@ -249,7 +247,7 @@ results_mgwr=model_mgwr.fit()
 
     
     Wall time: 7.64 s
-    
+
 
 
 ```python

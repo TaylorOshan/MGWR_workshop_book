@@ -1,5 +1,3 @@
-
-
 ```python
 #@title Python imports
 # A bit of imports
@@ -105,7 +103,9 @@ geo.plot(ax=ax)
 
 
 
+    
 ![png](Mapping_code_files/Mapping_code_6_1.png)
+    
 
 
 
@@ -143,7 +143,9 @@ geo_df.plot(ax=ax, markersize=8,alpha=1,color='tomato',marker="o")
 
 
 
+    
 ![png](Mapping_code_files/Mapping_code_8_1.png)
+    
 
 
 
@@ -500,7 +502,9 @@ mapp(col=final_geo,name='btn_water',color='Blues_r',filename="trial",normal=Fals
 ```
 
 
+    
 ![png](Mapping_code_files/Mapping_code_15_0.png)
+    
 
 
 

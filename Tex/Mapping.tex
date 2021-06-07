@@ -1,44 +1,30 @@
-
-% Default to the notebook output style
-
-    
-
-
-% Inherit from the specified cell style.
-
-
-
-
-    
 \documentclass[11pt]{article}
 
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
     
-    
-    \usepackage[T1]{fontenc}
-    % Nicer default font (+ math font) than Computer Modern for most use cases
-    \usepackage{mathpazo}
+    \usepackage{iftex}
+    \ifPDFTeX
+    	\usepackage[T1]{fontenc}
+    	\usepackage{mathpazo}
+    \else
+    	\usepackage{fontspec}
+    \fi
 
     % Basic figure setup, for now with no caption control since it's done
     % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
     \usepackage{graphicx}
-    % We will generate all images so they have a width \maxwidth. This means
-    % that they will get their normal width if they fit onto the page, but
-    % are scaled down if they would overflow the margins.
-    \makeatletter
-    \def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth
-    \else\Gin@nat@width\fi}
-    \makeatother
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
     \let\Oldincludegraphics\includegraphics
-    % Set max figure width to be 80% of text width, for now hardcoded.
-    \renewcommand{\includegraphics}[1]{\Oldincludegraphics[width=.8\maxwidth]{#1}}
     % Ensure that by default, figures have no caption (until we provide a
     % proper Figure object with a Caption API and a way to capture that
     % in the conversion process - todo).
     \usepackage{caption}
-    \DeclareCaptionLabelFormat{nolabel}{}
-    \captionsetup{labelformat=nolabel}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
 
-    \usepackage{adjustbox} % Used to constrain images to a maximum size 
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
     \usepackage{xcolor} % Allow colors to be defined
     \usepackage{enumerate} % Needed for markdown enumerations to work
     \usepackage{geometry} % Used to adjust the document margins
@@ -52,14 +38,32 @@
     \usepackage{upquote} % Upright quotes for verbatim code
     \usepackage{eurosym} % defines \euro
     \usepackage[mathletters]{ucs} % Extended unicode (utf-8) support
-    \usepackage[utf8x]{inputenc} % Allow utf-8 characters in the tex document
     \usepackage{fancyvrb} % verbatim replacement that allows latex
     \usepackage{grffile} % extends the file name processing of package graphics 
-                         % to support a larger range 
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
     % The hyperref package gives us a pdf with properly built
     % internal navigation ('pdf bookmarks' for the table of contents,
     % internal cross-reference links, web links for URLs, etc.)
     \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
     \usepackage{longtable} % longtable support required by pandoc >1.10
     \usepackage{booktabs}  % table support for pandoc > 1.12.2
     \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
@@ -68,7 +72,6 @@
     \usepackage{mathrsfs}
     
 
-    
     
     % Colors for the hyperref package
     \definecolor{urlcolor}{rgb}{0,.145,.698}
@@ -94,6 +97,9 @@
     \definecolor{ansi-white-intense}{HTML}{A1A6B2}
     \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
     \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
 
     % commands and environments needed by pandoc snippets
     % extracted from the output of `pandoc -s`
@@ -155,9 +161,7 @@
     
     
     
-
-    % Pygments definitions
-    
+% Pygments definitions
 \makeatletter
 \def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
     \let\PY@ul=\relax \let\PY@tc=\relax%
@@ -259,11 +263,97 @@
 \makeatother
 
 
+    % For linebreaks inside Verbatim environment from package fancyvrb. 
+    \makeatletter
+        \newbox\Wrappedcontinuationbox 
+        \newbox\Wrappedvisiblespacebox 
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}} 
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}} 
+        \newcommand*\Wrappedcontinuationindent {3ex } 
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox} 
+        % Take advantage of the already applied Pygments mark-up to insert 
+        % potential linebreaks for TeX processing. 
+        %        {, <, #, %, $, ' and ": go to next line. 
+        %        _, }, ^, &, >, - and ~: stay at end of broken line. 
+        % Use of \textquotesingle for straight quote. 
+        \newcommand*\Wrappedbreaksatspecials {% 
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}% 
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}% 
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}% 
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}% 
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}% 
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}% 
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}% 
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}% 
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}% 
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}% 
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}% 
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}% 
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}% 
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}% 
+        } 
+        % Some characters . , ; ? ! / are not pygmentized. 
+        % This macro makes them "active" and they will insert potential linebreaks 
+        \newcommand*\Wrappedbreaksatpunct {% 
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}% 
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}% 
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}% 
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}% 
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}% 
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}% 
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}% 
+            \catcode`\.\active
+            \catcode`\,\active 
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active 
+            \lccode`\~`\~ 	
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+        
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active 	
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
     % Exact colors from NB
-    \definecolor{incolor}{rgb}{0.0, 0.0, 0.5}
-    \definecolor{outcolor}{rgb}{0.545, 0.0, 0.0}
-
-
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+    
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
 
     
     % Prevent overflowing lines due to hard-to-break entities
@@ -282,8 +372,7 @@
     
     
 
-    \begin{document}
-    
+\begin{document}
     
     \maketitle
     
@@ -297,156 +386,204 @@ Mapping Parameter Coefficients
 \textbf{Notebook Outline:}
 
 \textbf{An example of hedonic house price modeling using MGWR} -
-Section \ref{mask-the-significant-coefficients} -
-Section \ref{spatial-join---results-to-shapefile} -
-Section \ref{maps-of-all-parameter-coefficients} -
-Section \ref{interpretation-of-maps}
+\hyperref[mask-the-significant-coefficients]{Code to Mask the Significant Coefficients}
+-
+\hyperref[spatial-join---results-to-shapefile]{Spatial Join - Results to Shapefile}
+-
+\hyperref[maps-of-all-parameter-coefficients]{Maps of all Parameter Coeffcients}
+- \hyperref[interpretation-of-maps]{Interpretation of Maps}
 
 \href{https://mehak-sachdeva.github.io/MGWR_workshop_book/}{Back to the
 main page}
 
-    \subsubsection{\texorpdfstring{If you want to follow along with the
+    \hypertarget{if-you-want-to-follow-along-with-the-code-follow-this-link}{%
+\subsubsection{\texorpdfstring{If you want to follow along with the
 code, follow
 \href{https://colab.research.google.com/drive/1oqnwg_HkY-L_MdRTT2qg5EL-LRrOzmbd?usp=sharing}{this
-link}}{If you want to follow along with the code, follow this link}}\label{if-you-want-to-follow-along-with-the-code-follow-this-link}
+link}}{If you want to follow along with the code, follow this link}}\label{if-you-want-to-follow-along-with-the-code-follow-this-link}}
 
+\hypertarget{the-shapefiles-for-mapping-the-parameter-coefficients-can-be-downloaded-here}{%
 \subsubsection{\texorpdfstring{The shapefiles for mapping the parameter
 coefficients can be
 \href{https://github.com/mehak-sachdeva/MGWR_Workshop_2020/archive/master.zip}{downloaded
-here}}{The shapefiles for mapping the parameter coefficients can be downloaded here}}\label{the-shapefiles-for-mapping-the-parameter-coefficients-can-be-downloaded-here}
+here}}{The shapefiles for mapping the parameter coefficients can be downloaded here}}\label{the-shapefiles-for-mapping-the-parameter-coefficients-can-be-downloaded-here}}
 
-    \section{Mask the Significant
-Coefficients}\label{mask-the-significant-coefficients}
+    \hypertarget{mask-the-significant-coefficients}{%
+\section{Mask the Significant
+Coefficients}\label{mask-the-significant-coefficients}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor} }]:} \PY{n}{b\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}Intercept}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
-        \PY{n}{bt\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}round\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
-        \PY{n}{t\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}Intercept}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
-        \PY{n}{t\PYZus{}crit} \PY{o}{=} \PY{p}{[}\PY{l+m+mf}{2.92}\PY{p}{,}\PY{l+m+mf}{2.94}\PY{p}{,}\PY{l+m+mf}{2.67}\PY{p}{,}\PY{l+m+mf}{2.99}\PY{p}{,}\PY{l+m+mf}{3.01}\PY{p}{,}\PY{l+m+mf}{2.14}\PY{p}{,}\PY{l+m+mf}{2.20}\PY{p}{,}\PY{l+m+mf}{2.41}\PY{p}{]}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{b\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}Intercept}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{bt\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}round\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{t\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}Intercept}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{t\PYZus{}avg\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
+\PY{n}{t\PYZus{}crit} \PY{o}{=} \PY{p}{[}\PY{l+m+mf}{2.92}\PY{p}{,}\PY{l+m+mf}{2.94}\PY{p}{,}\PY{l+m+mf}{2.67}\PY{p}{,}\PY{l+m+mf}{2.99}\PY{p}{,}\PY{l+m+mf}{3.01}\PY{p}{,}\PY{l+m+mf}{2.14}\PY{p}{,}\PY{l+m+mf}{2.20}\PY{p}{,}\PY{l+m+mf}{2.41}\PY{p}{]}
 \end{Verbatim}
+\end{tcolorbox}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor} }]:} \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{8}\PY{p}{)}\PY{p}{:}
-            \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZgt{}}\PY{o}{=}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
-            \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZlt{}}\PY{o}{=}\PY{o}{\PYZhy{}}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{8}\PY{p}{)}\PY{p}{:}
+    \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZgt{}}\PY{o}{=}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
+    \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZlt{}}\PY{o}{=}\PY{o}{\PYZhy{}}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
 \end{Verbatim}
+\end{tcolorbox}
 
-    \section{Spatial Join - Results to
-Shapefile}\label{spatial-join---results-to-shapefile}
+    \hypertarget{spatial-join---results-to-shapefile}{%
+\section{Spatial Join - Results to
+Shapefile}\label{spatial-join---results-to-shapefile}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor} }]:} \PY{n}{c}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{census\PYZus{}tracts/census\PYZus{}tracts.shp}\PY{l+s+s1}{\PYZsq{}}
-        \PY{n}{crs} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{EPSG}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{4326}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}
-        \PY{n}{geo} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{read\PYZus{}file}\PY{p}{(}\PY{n}{c}\PY{p}{,}\PY{n}{crs}\PY{o}{=}\PY{n}{crs}\PY{p}{)}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{geometry}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{objectid}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
-        \PY{n}{fig}\PY{p}{,}\PY{n}{ax} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{)}\PY{p}{)}
-        \PY{n}{geo}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{)}
-        
-        \PY{n}{coords} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n+nb}{list}\PY{p}{(}\PY{n+nb}{zip}\PY{p}{(}\PY{n}{census}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{x\PYZus{}coor}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,}\PY{n}{census}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y\PYZus{}coor}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}\PY{p}{)}\PY{p}{)}
-        \PY{n}{geom\PYZus{}points} \PY{o}{=} \PY{p}{[}\PY{n}{Point}\PY{p}{(}\PY{n}{xy}\PY{p}{)} \PY{k}{for} \PY{n}{xy} \PY{o+ow}{in} \PY{n}{coords}\PY{p}{]}
-        \PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{GeoDataFrame}\PY{p}{(}\PY{n}{census}\PY{p}{,}\PY{n}{crs}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{init}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{epsg:4326}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{,}\PY{n}{geometry}\PY{o}{=}\PY{n}{geom\PYZus{}points}\PY{p}{)}
-        \PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{rename}\PY{p}{(}\PY{n}{columns}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{OBJECTID}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}
-        \PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{to\PYZus{}crs}\PY{p}{(}\PY{n}{epsg}\PY{o}{=}\PY{l+m+mi}{3857}\PY{p}{)}
-        \PY{n}{final\PYZus{}geo} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{sjoin}\PY{p}{(}\PY{n}{geo}\PY{p}{,} \PY{n}{geo\PYZus{}df}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{inner}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{op}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{contains}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{lsuffix}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{left}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{rsuffix}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{right}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-        
-        \PY{n}{fig}\PY{p}{,}\PY{n}{ax} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{)}\PY{p}{)}
-        \PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}facecolor}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{white}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-        \PY{n}{final\PYZus{}geo}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{gold}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-        \PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{,} \PY{n}{markersize}\PY{o}{=}\PY{l+m+mi}{8}\PY{p}{,}\PY{n}{alpha}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{tomato}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{marker}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{o}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{c}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{census\PYZus{}tracts/census\PYZus{}tracts.shp}\PY{l+s+s1}{\PYZsq{}}
+\PY{n}{crs} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{EPSG}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{4326}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}
+\PY{n}{geo} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{read\PYZus{}file}\PY{p}{(}\PY{n}{c}\PY{p}{,}\PY{n}{crs}\PY{o}{=}\PY{n}{crs}\PY{p}{)}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{geometry}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{objectid}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+\PY{n}{fig}\PY{p}{,}\PY{n}{ax} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{)}\PY{p}{)}
+\PY{n}{geo}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{)}
+
+\PY{n}{coords} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{n+nb}{list}\PY{p}{(}\PY{n+nb}{zip}\PY{p}{(}\PY{n}{census}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{x\PYZus{}coor}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,}\PY{n}{census}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{y\PYZus{}coor}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}\PY{p}{)}\PY{p}{)}
+\PY{n}{geom\PYZus{}points} \PY{o}{=} \PY{p}{[}\PY{n}{Point}\PY{p}{(}\PY{n}{xy}\PY{p}{)} \PY{k}{for} \PY{n}{xy} \PY{o+ow}{in} \PY{n}{coords}\PY{p}{]}
+\PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{GeoDataFrame}\PY{p}{(}\PY{n}{census}\PY{p}{,}\PY{n}{crs}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{init}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{epsg:4326}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{,}\PY{n}{geometry}\PY{o}{=}\PY{n}{geom\PYZus{}points}\PY{p}{)}
+\PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{rename}\PY{p}{(}\PY{n}{columns}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{OBJECTID}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}
+\PY{n}{geo\PYZus{}df} \PY{o}{=} \PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{to\PYZus{}crs}\PY{p}{(}\PY{n}{epsg}\PY{o}{=}\PY{l+m+mi}{3857}\PY{p}{)}
+\PY{n}{final\PYZus{}geo} \PY{o}{=} \PY{n}{gpd}\PY{o}{.}\PY{n}{sjoin}\PY{p}{(}\PY{n}{geo}\PY{p}{,} \PY{n}{geo\PYZus{}df}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{inner}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{op}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{contains}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{lsuffix}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{left}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{rsuffix}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{right}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+
+\PY{n}{fig}\PY{p}{,}\PY{n}{ax} \PY{o}{=} \PY{n}{plt}\PY{o}{.}\PY{n}{subplots}\PY{p}{(}\PY{n}{figsize}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{20}\PY{p}{,}\PY{l+m+mi}{15}\PY{p}{)}\PY{p}{)}
+\PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}facecolor}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{white}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{final\PYZus{}geo}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{,} \PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{gold}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{geo\PYZus{}df}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{ax}\PY{o}{=}\PY{n}{ax}\PY{p}{,} \PY{n}{markersize}\PY{o}{=}\PY{l+m+mi}{8}\PY{p}{,}\PY{n}{alpha}\PY{o}{=}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{tomato}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{marker}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{o}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
-    \section{Maps of all Parameter
-Coefficients}\label{maps-of-all-parameter-coefficients}
+    \hypertarget{maps-of-all-parameter-coefficients}{%
+\section{Maps of all Parameter
+Coefficients}\label{maps-of-all-parameter-coefficients}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}1}]:} \PY{k+kn}{import} \PY{n+nn}{mapping\PYZus{}results} \PY{k}{as} \PY{n+nn}{maps}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{mapping\PYZus{}results} \PY{k}{as} \PY{n+nn}{maps}
 \end{Verbatim}
+\end{tcolorbox}
 
-    \subsubsection{All parameter estimates for age
-covariate}\label{all-parameter-estimates-for-age-covariate}
+    \hypertarget{all-parameter-estimates-for-age-covariate}{%
+\subsubsection{All parameter estimates for age
+covariate}\label{all-parameter-estimates-for-age-covariate}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}7}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{RdBu\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{b\PYZus{}age}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{7}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{RdBu\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{b\PYZus{}age}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_10_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \subsubsection{Only significant parameter estimates for age
-covariate}\label{only-significant-parameter-estimates-for-age-covariate}
+    \hypertarget{only-significant-parameter-estimates-for-age-covariate}{%
+\subsubsection{Only significant parameter estimates for age
+covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}6}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}age}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}age}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_12_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}9}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{9}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_13_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}10}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}sqft}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{10}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}sqft}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_14_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}13}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}unemp}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{13}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}unemp}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_15_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}17}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}tech}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{17}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Reds}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}tech}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_16_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}20}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{RdBu\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}constant}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{20}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{RdBu\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}constant}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_17_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \section{Interpretation of Maps}\label{interpretation-of-maps}
+    \hypertarget{interpretation-of-maps}{%
+\section{Interpretation of Maps}\label{interpretation-of-maps}}
 
-    \subsubsection{Interpreting the map with distance to nearest
-waterfront}\label{interpreting-the-map-with-distance-to-nearest-waterfront}
+    \hypertarget{interpreting-the-map-with-distance-to-nearest-waterfront}{%
+\subsubsection{Interpreting the map with distance to nearest
+waterfront}\label{interpreting-the-map-with-distance-to-nearest-waterfront}}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}21}]:} \PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{21}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{maps}\PY{o}{.}\PY{n}{mapp}\PY{p}{(}\PY{n}{name}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{color}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Blues\PYZus{}r}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{n}{filename}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{normal}\PY{o}{=}\PY{k+kc}{False}\PY{p}{)}
 \end{Verbatim}
+\end{tcolorbox}
 
     \begin{center}
     \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_20_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
-    \paragraph{Scale of spatial units used is essential in interpreting the
+    \hypertarget{scale-of-spatial-units-used-is-essential-in-interpreting-the-results-of-the-parameter-coefficients}{%
+\paragraph{Scale of spatial units used is essential in interpreting the
 results of the parameter
-coefficients}\label{scale-of-spatial-units-used-is-essential-in-interpreting-the-results-of-the-parameter-coefficients}
+coefficients}\label{scale-of-spatial-units-used-is-essential-in-interpreting-the-results-of-the-parameter-coefficients}}
 
 The model that we are using is a log-linear model, where only the
 dependent variable (\emph{y}) is log-transformed. The interpretation of
@@ -457,15 +594,21 @@ dependent variable (\emph{y}) is log-transformed. The interpretation of
 
 \href{https://data.library.virginia.edu/interpreting-log-transformations-in-a-linear-model/}{Source}
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}27}]:} \PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
-         \PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{0.6}\PY{p}{)}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{100}
-\end{Verbatim}
-
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{27}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}27}]:} -45.11883639059735
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{0.6}\PY{p}{)}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{100}
 \end{Verbatim}
-            
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{27}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+-45.11883639059735
+\end{Verbatim}
+\end{tcolorbox}
+        
     From the map above, with every unit increase in the average distance of
 houses to the waterfront in the census tract containing University of
 Washington and Bill Gate's House, holding all other variable constant,
@@ -491,24 +634,30 @@ the geography or location, MGWR results demonstrate the power of local
 regression by producing a much better model fit and more plausible and
 intuitive coefficient estimates.
 
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}28}]:} \PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{0.21}\PY{p}{)}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{100}
-\end{Verbatim}
-
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{28}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}28}]:} -18.941575402981293
+\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{0.21}\PY{p}{)}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{100}
 \end{Verbatim}
-            
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{28}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+-18.941575402981293
+\end{Verbatim}
+\end{tcolorbox}
+        
     \href{http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Interpretation}{Previous}
 
 \href{https://mehak-sachdeva.github.io/MGWR_workshop_book/}{Back to the
 main page}
 
-    \begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+    \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 
     % Add a bibliography block to the postdoc
     
     
     
-    \end{document}
+\end{document}

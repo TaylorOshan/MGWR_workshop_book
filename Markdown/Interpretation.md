@@ -1,4 +1,3 @@
-
 # <center> Interpretation and Understanding Outputs </center>
 
 **Notebook Outline:**  
