@@ -8,7 +8,7 @@
 - [MGWR Results - Bandwidth Parameters](#MGWR-Results---Bandwidth-Parameters) 
 - [MGWR Results - Parameter Estimates](#MGWR-Results---Parameter-Estimates)<br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 # Global Model Results
@@ -54,10 +54,10 @@ The **beta_** columns need to be filtered to have only the significant parameter
 
 <img src="../images/t_crit.png" width="700">
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Mapping)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Mapping)
 
-[Previous](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Example)
+[Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Example)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***

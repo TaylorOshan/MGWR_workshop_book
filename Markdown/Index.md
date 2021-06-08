@@ -15,7 +15,7 @@ Email: [toshan@umd.edu](mailto:toshan@umd.edu)
 
 Twitter handle: [@TaylorOshan](https://twitter.com/TaylorOshan)
 
-**The content for this workshop was originally developed by [Mehak Sachdeva]() for the UCGIS 2020 workshop series**
+**Aside from a few updates, the core content for this workshop was originally (and fantastically) prepared by [Mehak Sachdeva](mailto:msachde1@asu.edu), who is currently a [PhD candidate at ASU](https://sgsup.asu.edu/mehak-sachdeva), for the [UCGIS 2020 workshop](https://mehak-sachdeva.github.io/MGWR_workshop_book/) series. All errors are of course my own!**
 
 ### Goal
 
@@ -27,30 +27,37 @@ Twitter handle: [@TaylorOshan](https://twitter.com/TaylorOshan)
 ### Table of Contents
 
 ***
-1. **[Spatial Patterns and Processes](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Patterns-processes)**<br><br>
+1. **[Spatial Patterns and Processes](http://tayloroshan.github.io/MGWR_workshop_book/Html/Patterns-processes)**<br><br>
 
-2. **[Regression Models - The why and the how](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Regression-models)**<br><br>
+2. **[Regression Models - The why and the how](http://tayloroshan.github.io/MGWR_workshop_book/Html/Regression-models)**<br><br>
 
-3. **[Methodological Review - GWR and MGWR](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Methodology)**<br><br>
+3. **[Methodological Review - GWR and MGWR](http://tayloroshan.github.io/MGWR_workshop_book/Html/Methodology)**<br><br>
 
-4. **[Hands-on Example with MGWR](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Example)**<br><br>
+4. **[Hands-on Example with MGWR](http://tayloroshan.github.io/MGWR_workshop_book/Html/Example)**<br><br>
 
-5. **[Interpretation and Understanding Outputs](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Interpretation)**<br><br>
+5. **[Interpretation and Understanding Outputs](http://tayloroshan.github.io/MGWR_workshop_book/Html/Interpretation)**<br><br>
 
-6. **[Mapping Parameter Coefficients](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Mapping)**<br><br>
+6. **[Mapping Parameter Coefficients](http://tayloroshan.github.io/MGWR_workshop_book/Html/Mapping)**<br><br>
 
 
 ### Resources
 
 ***
+**Workshop book (this page): https://TaylorOshan.github.io/MGWR_workshop_book/**<br><br>
+**Workshop book source: https://github.com/TaylorOshan/MGWR_workshop_book/**<br><br>
+**Download the software and manual here: https://sgsup.asu.edu/sparc/mgwr** <br><br>
+**Datasets used in the workshop: (1) [Seattle House Prices](https://www.dropbox.com/s/13uvgo4w3mvfxyk/example_dataset.csv?dl=1)** <br><br>
+**Open-source Python code API: https://github.com/pysal/mgwr** <br><br>
 
-**Github book resource: https://mehak-sachdeva.github.io/MGWR_workshop_book/**<br><br>
-**Download the software here: https://sgsup.asu.edu/sparc/mgwr** <br><br>
-**Data used in the software: [Direct download link](http://msachdeva.cartodb.com/api/v2/sql?filename=example_dataset&format=csv&q=SELECT+*+FROM+census_tracts_final+as+example_data)** <br><br>
-**Python open-source package: https://github.com/pysal/mgwr** <br><br>
+
+### Running Acknowledgements
+
+#### 2021
+
+- Mehak Sachdeva for producing the original (open source!) workshop content and being kind enough to allow me to use it and build upon it.
 
 
-### Acknowledgements
+#### 2020
 
 ***
 
@@ -58,4 +65,4 @@ Twitter handle: [@TaylorOshan](https://twitter.com/TaylorOshan)
 
 - MGWR Development Team: Ziqi Li, Taylor Oshan, Stewart Fotheringham, Wei Kang, Levi Wolf, Hanchen Yu, Mehak Sachdeva, and Sarah Bardin (Spatial Analysis Research Center (SPARC), Arizona State University, Tempe, USA)
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Patterns-processes)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Patterns-processes)

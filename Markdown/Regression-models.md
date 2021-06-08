@@ -7,7 +7,7 @@
 - [Hedonic House Price Models](#Hedonic-House-Price-Models)
 - [Spatial Dependency and Heterogeneity](#Spatial-Dependency-and-Heterogeneity) <br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 # Introduction
@@ -57,10 +57,10 @@ Spatial phenomenon exhibit spatial heterogeneity that is, we expect values to be
 
 * *Please note, the mapped estimates above are only representational.*
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Methodology)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Methodology)
 
-[Previous](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Patterns-processes)
+[Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Patterns-processes)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***

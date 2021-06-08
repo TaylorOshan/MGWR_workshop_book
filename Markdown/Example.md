@@ -7,14 +7,14 @@
 - [Loading the dataset](#Loading-the-Dataset)
 - [Spatial Weighting Kernels and other Options](#Spatial-Weighting-Kernels-and-other-Options) <br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 # Introduction to the Dataset
 
 ***
 
-### Please use [this link](http://msachdeva.cartodb.com/api/v2/sql?filename=example_dataset&format=csv&q=SELECT+*+FROM+census_tracts_final+as+example_data) to directly download a csv of the dataset
+### Please use [this link](https://www.dropbox.com/s/13uvgo4w3mvfxyk/example_dataset.csv?dl=1) to directly download a csv of the dataset
 
 The raw data has been obtained from https://www.kaggle.com/harlfoxem/housesalesprediction.
 The data are cleaned and aggregated to the census tract level for King county, WA to make it smaller in size and manageable for the workshop.
@@ -88,10 +88,10 @@ At this stage I am going to do the steps elaborated below live. The screenshots 
 
 <img src="../images/advanced.png" width="700">
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Interpretation)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Interpretation)
 
-[Previous](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Methodology)
+[Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Methodology)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***

@@ -8,7 +8,7 @@
 - [Maps of all Parameter Coeffcients](#Maps-of-all-Parameter-Coefficients) 
 - [Interpretation of Maps](#Interpretation-of-Maps)<br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 ### If you want to follow along with the code, follow [this link](https://colab.research.google.com/drive/1oqnwg_HkY-L_MdRTT2qg5EL-LRrOzmbd?usp=sharing)
@@ -199,8 +199,8 @@ As seen in this example (and as can be expanded using other parameter coefficien
 
 
 
-[Previous](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Interpretation)
+[Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Interpretation)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***

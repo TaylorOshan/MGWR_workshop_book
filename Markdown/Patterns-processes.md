@@ -9,7 +9,7 @@
  - [New York Skyline](#New-York-Skyline-example)
  - [Human Migration](#Human-Migration-example)<br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 # Introduction
@@ -55,10 +55,10 @@ Migration is a complex social phenomenon and is often a result of many processes
 
 This example, brings to the forefront the issue of **spatial scale of processes** that affect the pattern we observe. There is no way of understanding human migration if processes operating at different scales are not considered and the scales at which the processes most affect the pattern are unknown. This is true for most of the complex phenomena we observe in the world.
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Regression-models)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Regression-models)
 
-[Previous](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Previous](https://tayloroshan.github.io/MGWR_workshop_book/)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***

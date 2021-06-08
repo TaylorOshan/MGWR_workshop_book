@@ -7,7 +7,7 @@
 - [Bandwidth - Indicator of Scale](#Bandwidth---Indicator-of-Scale)
 - [**Multiscale** Geographically Weighted Regression (MGWR)](#Multiscale-Geographically-Weighted-Regression) <br><br>
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
 # Geographically Weighted Regression (GWR)
@@ -47,10 +47,10 @@ In the simulated example below, for example, an MGWR model will potentially be a
 
 <img src="../images/MGWR_band.PNG" width="800">
 
-[Next](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Example)
+[Next](http://tayloroshan.github.io/MGWR_workshop_book/Html/Example)
 
-[Previous](http://mehak-sachdeva.github.io/MGWR_workshop_book/Html/Regression-models)
+[Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Regression-models)
 
-[Back to the main page](https://mehak-sachdeva.github.io/MGWR_workshop_book/)
+[Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 ***
