@@ -1,19 +1,21 @@
-# <center> Multiscale Geographically Weighted Regression<br><br>UCGIS Workshop - 2020 <center>
+# <center> Local Modeling & Multiscale Geographically Weighted Regression<br><br>UCGIS Workshop - 2021 <center>
 
-<center> Mehak Sachdeva </center>
-<center> Ph.D. candidate in Computational Spatial Science </center>
-<center> Spatial Analysis Research Center </center>
-<center> School of Geographical Sciences and Urban Planning </center>
-<center> Arizona State University </center><br>
+<center> Taylor Oshan </center>
+<center> Assistant Professor of GISc. </center>
+<center> Center for Geospatial Information Science </center>
+<center> School of Geographical Sciences </center>
+<center> University of Maryland, College Park </center><br>
 
 
-<center> Presented on 7/20/2020 - UCGIS Workshop Series </center><br>
+<center> Presented on 6/11/2021 - UCGIS Workshop Series </center><br>
 
 **Contact information**
 
-Email: [mehaksachdeva@asu.edu](mailto:msachde1@asu.edu)
+Email: [toshan@umd.edu](mailto:toshan@umd.edu)
 
-Twitter handle: [@MehakSachdeva_](https://twitter.com/MehakSachdeva_)
+Twitter handle: [@TaylorOshan](https://twitter.com/TaylorOshan)
+
+**The content for this workshop was originally developed by [Mehak Sachdeva]() for the UCGIS 2020 workshop series**
 
 ### Goal
 
