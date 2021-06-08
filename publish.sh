@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Generate the Slides and Pages
-jupyter-nbconvert --to html Notebooks/Index.ipynb --template lab --reveal-prefix=reveal.js
+jupyter-nbconvert --to html Notebooks/Index.ipynb --template classic --reveal-prefix=reveal.js
 mv Notebooks/Index.html  index.html
 
 cd Notebooks
