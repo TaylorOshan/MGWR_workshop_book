@@ -11,7 +11,7 @@
 [Back to the main page](https://tayloroshan.github.io/MGWR_workshop_book/)
 
 
-### If you want to follow along with the code, follow [this link](https://colab.research.google.com/drive/1XT7ziqd7QIpitYmNT9Fr8uUXlihTsbmf?usp=sharing)
+### If you want to follow along with the code, follow [this link](https://colab.research.google.com/drive/1oqnwg_HkY-L_MdRTT2qg5EL-LRrOzmbd?usp=sharing)
 
 ### The shapefiles for mapping the parameter coefficients can be [downloaded here](https://github.com/mehak-sachdeva/MGWR_Workshop_2020/archive/master.zip)
 
@@ -31,6 +31,20 @@ for i in range(8):
     census.loc[census[t_cols[i]] >=t_crit[i], bt_cols[i]] = census[b_cols[i]]
     census.loc[census[t_cols[i]] <=-t_crit[i], bt_cols[i]] = census[b_cols[i]]
 ```
+
+
+    ---------------------------------------------------------------------------
+
+    NameError                                 Traceback (most recent call last)
+
+    <ipython-input-2-be24013968f5> in <module>
+          1 for i in range(8):
+    ----> 2     census.loc[census[t_cols[i]] >=t_crit[i], bt_cols[i]] = census[b_cols[i]]
+          3     census.loc[census[t_cols[i]] <=-t_crit[i], bt_cols[i]] = census[b_cols[i]]
+
+
+    NameError: name 'census' is not defined
+
 
 # Spatial Join - Results to Shapefile
 
@@ -71,7 +85,7 @@ maps.mapp(name='beta_avg_age',color='RdBu_r',filename="b_age",normal=False)
 
 
     
-![png](Mapping_files/Mapping_10_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_10_0.png)
     
 
 
@@ -84,7 +98,7 @@ maps.mapp(name='bt_age',color='Reds',filename="bt_age",normal=False)
 
 
     
-![png](Mapping_files/Mapping_12_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_12_0.png)
     
 
 
@@ -95,7 +109,7 @@ maps.mapp(name='bt_water_dist',color='Blues_r',filename="bt_water_dist",normal=F
 
 
     
-![png](Mapping_files/Mapping_13_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_13_0.png)
     
 
 
@@ -106,7 +120,7 @@ maps.mapp(name='bt_sqft',color='Reds',filename="bt_sqft",normal=False)
 
 
     
-![png](Mapping_files/Mapping_14_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_14_0.png)
     
 
 
@@ -117,7 +131,7 @@ maps.mapp(name='bt_unemp',color='Blues_r',filename="bt_unemp",normal=False)
 
 
     
-![png](Mapping_files/Mapping_15_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_15_0.png)
     
 
 
@@ -128,7 +142,7 @@ maps.mapp(name='bt_tech',color='Reds',filename="bt_tech",normal=False)
 
 
     
-![png](Mapping_files/Mapping_16_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_16_0.png)
     
 
 
@@ -139,7 +153,7 @@ maps.mapp(name='bt_constant',color='RdBu_r',filename="bt_constant",normal=False)
 
 
     
-![png](Mapping_files/Mapping_17_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_17_0.png)
     
 
 
@@ -154,7 +168,7 @@ maps.mapp(name='bt_water_dist',color='Blues_r',filename="bt_water_dist",normal=F
 
 
     
-![png](Mapping_files/Mapping_20_0.png)
+![png](Mapping-Copy1_files/Mapping-Copy1_20_0.png)
     
 
 
@@ -166,8 +180,18 @@ The model that we are using is a log-linear model, where only the dependent vari
 
 [Source](https://data.library.virginia.edu/interpreting-log-transformations-in-a-linear-model/)
 
+
+```python
 import numpy as np
 (np.exp(-0.6)-1)*100
+```
+
+
+
+
+    -45.11883639059735
+
+
 
 From the map above, with every unit increase in the average distance of houses to the waterfront in the census tract containing University of Washington and Bill Gate's House, holding all other variable constant, the house price would decrease by approximately **45%** (since the Beta is -0.6). This is a huge change and is observed to be more prominent around the areas adjacent to Lake Washington and near Discovery park and Alki beach.
 
@@ -188,16 +212,6 @@ As seen in this example (and as can be expanded using other parameter coefficien
     -18.941575402981293
 
 
-
-# Additional maps for comparing GWR & MGWR
-
-<img src="../images/intercept.png">
-
-<img src="../images/sqft.png">
-
-<img src="../images/distance.png">
-
-<img src="../images/tech.png">
 
 [Previous](http://tayloroshan.github.io/MGWR_workshop_book/Html/Interpretation)
 

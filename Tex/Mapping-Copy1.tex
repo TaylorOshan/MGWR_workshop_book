@@ -155,7 +155,7 @@
     \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
     % Document parameters
     % Document title
-    \title{Mapping}
+    \title{Mapping-Copy1}
     
     
     
@@ -399,7 +399,7 @@ main page}
     \hypertarget{if-you-want-to-follow-along-with-the-code-follow-this-link}{%
 \subsubsection{\texorpdfstring{If you want to follow along with the
 code, follow
-\href{https://colab.research.google.com/drive/1XT7ziqd7QIpitYmNT9Fr8uUXlihTsbmf?usp=sharing}{this
+\href{https://colab.research.google.com/drive/1oqnwg_HkY-L_MdRTT2qg5EL-LRrOzmbd?usp=sharing}{this
 link}}{If you want to follow along with the code, follow this link}}\label{if-you-want-to-follow-along-with-the-code-follow-this-link}}
 
 \hypertarget{the-shapefiles-for-mapping-the-parameter-coefficients-can-be-downloaded-here}{%
@@ -413,7 +413,7 @@ here}}{The shapefiles for mapping the parameter coefficients can be downloaded h
 Coefficients}\label{mask-the-significant-coefficients}}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{ }{\boxspacing}
+\prompt{In}{incolor}{1}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{n}{b\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}Intercept}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{beta\PYZus{}avg\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
 \PY{n}{bt\PYZus{}cols} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}age}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}water\PYZus{}dist}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}sqft}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}round\PYZus{}basement}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}index}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}unemp}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{bt\PYZus{}tech}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}
@@ -423,13 +423,24 @@ Coefficients}\label{mask-the-significant-coefficients}}
 \end{tcolorbox}
 
     \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
-\prompt{In}{incolor}{ }{\boxspacing}
+\prompt{In}{incolor}{2}{\boxspacing}
 \begin{Verbatim}[commandchars=\\\{\}]
 \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{8}\PY{p}{)}\PY{p}{:}
     \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZgt{}}\PY{o}{=}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
     \PY{n}{census}\PY{o}{.}\PY{n}{loc}\PY{p}{[}\PY{n}{census}\PY{p}{[}\PY{n}{t\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{\PYZlt{}}\PY{o}{=}\PY{o}{\PYZhy{}}\PY{n}{t\PYZus{}crit}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{,} \PY{n}{bt\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]} \PY{o}{=} \PY{n}{census}\PY{p}{[}\PY{n}{b\PYZus{}cols}\PY{p}{[}\PY{n}{i}\PY{p}{]}\PY{p}{]}
 \end{Verbatim}
 \end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}, frame=single, framerule=2mm, rulecolor=\color{outerrorbackground}]
+\textcolor{ansi-red}{---------------------------------------------------------------------------}
+\textcolor{ansi-red}{NameError}                                 Traceback (most recent call last)
+\textcolor{ansi-green}{<ipython-input-2-be24013968f5>} in \textcolor{ansi-cyan}{<module>}
+\textcolor{ansi-green-intense}{\textbf{      1}} \textcolor{ansi-green}{for} i \textcolor{ansi-green}{in} range\textcolor{ansi-blue}{(}\textcolor{ansi-cyan}{8}\textcolor{ansi-blue}{)}\textcolor{ansi-blue}{:}
+\textcolor{ansi-green}{----> 2}\textcolor{ansi-red}{     }census\textcolor{ansi-blue}{.}loc\textcolor{ansi-blue}{[}census\textcolor{ansi-blue}{[}t\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]} \textcolor{ansi-blue}{>=}t\_crit\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{,} bt\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]} \textcolor{ansi-blue}{=} census\textcolor{ansi-blue}{[}b\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]}
+\textcolor{ansi-green-intense}{\textbf{      3}}     census\textcolor{ansi-blue}{.}loc\textcolor{ansi-blue}{[}census\textcolor{ansi-blue}{[}t\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]} \textcolor{ansi-blue}{<=}\textcolor{ansi-blue}{-}t\_crit\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{,} bt\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]} \textcolor{ansi-blue}{=} census\textcolor{ansi-blue}{[}b\_cols\textcolor{ansi-blue}{[}i\textcolor{ansi-blue}{]}\textcolor{ansi-blue}{]}
+
+\textcolor{ansi-red}{NameError}: name 'census' is not defined
+    \end{Verbatim}
 
     \hypertarget{spatial-join---results-to-shapefile}{%
 \section{Spatial Join - Results to
@@ -481,7 +492,7 @@ covariate}\label{all-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_10_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_10_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -497,7 +508,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_12_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_12_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -509,7 +520,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_13_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_13_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -521,7 +532,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_14_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_14_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -533,7 +544,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_15_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_15_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -545,7 +556,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_16_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_16_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -557,7 +568,7 @@ covariate}\label{only-significant-parameter-estimates-for-age-covariate}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_17_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_17_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -576,7 +587,7 @@ waterfront}\label{interpreting-the-map-with-distance-to-nearest-waterfront}}
 \end{tcolorbox}
 
     \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping_files/Mapping_20_0.png}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Mapping-Copy1_files/Mapping-Copy1_20_0.png}
     \end{center}
     { \hspace*{\fill} \\}
     
@@ -594,8 +605,21 @@ dependent variable (\emph{y}) is log-transformed. The interpretation of
 
 \href{https://data.library.virginia.edu/interpreting-log-transformations-in-a-linear-model/}{Source}
 
-    import numpy as np (np.exp(-0.6)-1)*100
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{27}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{exp}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mf}{0.6}\PY{p}{)}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{l+m+mi}{100}
+\end{Verbatim}
+\end{tcolorbox}
 
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{27}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+-45.11883639059735
+\end{Verbatim}
+\end{tcolorbox}
+        
     From the map above, with every unit increase in the average distance of
 houses to the waterfront in the census tract containing University of
 Washington and Bill Gate's House, holding all other variable constant,
@@ -635,18 +659,6 @@ intuitive coefficient estimates.
 \end{Verbatim}
 \end{tcolorbox}
         
-    \hypertarget{additional-maps-for-comparing-gwr-mgwr}{%
-\section{Additional maps for comparing GWR \&
-MGWR}\label{additional-maps-for-comparing-gwr-mgwr}}
-
-    
-
-    
-
-    
-
-    
-
     \href{http://tayloroshan.github.io/MGWR_workshop_book/Html/Interpretation}{Previous}
 
 \href{https://tayloroshan.github.io/MGWR_workshop_book/}{Back to the

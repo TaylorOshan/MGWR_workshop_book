@@ -84,7 +84,7 @@ At this stage I am going to do the steps elaborated below live. The screenshots 
 
 <img src="../images/spatial_weights.PNG" width="700">
 
-<img src="../images/gauss_kernel.png" width="700">
+<table><tr><td><img src='../images/gauss_kernel.png'></td><td><img src='../images/exp_kernel.png'></td><td><img src='../images/bs_kernel.png'></td></tr></table>
 
 ### Advanced options
 
